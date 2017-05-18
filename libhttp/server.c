@@ -341,6 +341,13 @@ void initServer(struct Server *server, int localhostOnly, int portMin,
   serverAddr.sin_family         = AF_INET;
   serverAddr.sin_addr.s_addr    = htonl(localhostOnly
                                         ? INADDR_LOOPBACK : INADDR_ANY);
+  // Bind to OPENSHIFT_PYTHON_IP in a openshift setup, currently only ipv4
+  // Now only support python application.
+  // TODO: support more application type. How?
+  int bind_addr = 0;
+  char *openshift_ip            = getenv("OPENSHIFT_PYTHON_IP");
+  if (openshift_ip && inet_pton(AF_INET, openshift_ip, &bind_addr))
+    serverAddr.sin_addr.s_addr  = bind_addr;
 
   // Linux unlike BSD does not have support for picking a local port range.
   // So, we have to randomly pick a port from our allowed port range, and then
