@@ -1031,7 +1031,8 @@ static pam_handle_t *internalLogin(struct Service *service, struct Utmp *utmp,
           if (!((ch >= '0' && ch <= '9') ||
                 (ch >= 'A' && ch <= 'Z') ||
                 (ch >= 'a' && ch <= 'z') ||
-                ch == '-' || ch == '_' || ch == '.' || ch == '@')) {
+                ch == '-' || ch == '_' || ch == '.' || ch == '@' ||
+                ch == ':'  )) {
             goto invalid_user_name;
           }
         }
@@ -1042,24 +1043,35 @@ static pam_handle_t *internalLogin(struct Service *service, struct Utmp *utmp,
       user                     = NULL;
     }
     free(prompt);
-    char *cmdline              = stringPrintf(NULL, service->cmdline, user);
-    free(user);
 
-    // Replace '@localhost' with the actual host name. This results in a nicer
-    // prompt when SSH asks for the password.
+    char *cmdline              = NULL;
+    char *sshPort              = NULL;
+    char *ptr                  = strrchr(user, ':');
+    if (ptr) {
+      sshPort = stringPrintf(NULL, "%s", ptr + 1);
+      *ptr                     = '\000';
+    } else {
+      sshPort = stringPrintf(NULL, "%s", "22");
+    }
+    cmdline              = stringPrintf(NULL, service->cmdline, sshPort, user);
+
+    // add '@localhost' if no actual host name is provided.
     char *ptr                  = strrchr(cmdline, '@');
-    if (!strcmp(ptr + 1, "localhost")) {
-      int offset               = ptr + 1 - cmdline;
+    if (!ptr) {
+      int offset               = strlen(cmdline);
       check(cmdline            = realloc(cmdline,
-                                         strlen(cmdline) + strlen(fqdn) -
+                                         offset +
                                          strlen("localhost") + 1));
       ptr                      = cmdline + offset;
       *ptr                     = '\000';
-      strncat(ptr, fqdn, strlen(fqdn));
+      strncat(ptr, "localhost", strlen("localhost"));
     }
 
+    // TODO: add some dirty tricks here if you want. :)
     free((void *)service->cmdline);
     service->cmdline           = cmdline;
+    free(sshPort);
+    free(user);
 
     // Run SSH as an unprivileged user
     if ((service->uid          = restricted) == 0) {

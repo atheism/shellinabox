@@ -182,7 +182,7 @@ void initService(struct Service *service, const char *arg) {
 //          feature, we cannot be sure that it is available on the
 //          target server.  Removing it for the sake of Centos.
 //          "-oVisualHostKey=no"
-          " -oLogLevel=FATAL -p%s %%s@%s",sshPort,  host);
+          " -oLogLevel=FATAL -p %%s %%s");
     free(host);
     free(sshPort);
   } else {
