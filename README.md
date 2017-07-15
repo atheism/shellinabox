@@ -2,6 +2,8 @@
 shellinabox
 ===========
 
+*ATTENTION*: Be aware of illegal abuse if you want to use this as a gateway.
+
 [![Build Status](https://drone.io/github.com/shellinabox/shellinabox/status.png)](https://drone.io/github.com/shellinabox/shellinabox/latest)
 [![Join the chat at https://gitter.im/shellinabox/shellinabox](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/shellinabox/shellinabox?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
