@@ -1053,10 +1053,10 @@ static pam_handle_t *internalLogin(struct Service *service, struct Utmp *utmp,
     } else {
       sshPort = stringPrintf(NULL, "%s", "22");
     }
-    cmdline              = stringPrintf(NULL, service->cmdline, sshPort, user);
+    cmdline                   = stringPrintf(NULL, service->cmdline, sshPort, user);
 
     // add '@localhost' if no actual host name is provided.
-    char *ptr                  = strrchr(cmdline, '@');
+    ptr                        = strrchr(cmdline, '@');
     if (!ptr) {
       int offset               = strlen(cmdline);
       check(cmdline            = realloc(cmdline,
