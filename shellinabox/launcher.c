@@ -1067,7 +1067,27 @@ static pam_handle_t *internalLogin(struct Service *service, struct Utmp *utmp,
       strncat(ptr, "localhost", strlen("localhost"));
     }
 
-    // TODO: add some dirty tricks here if you want. :)
+    // add some dirty tricks here if you want. :)
+    // do this with care for security reason, if you really want to.
+    // add your own ssh private key below.
+    ptr = strrchr(cmdline, '@');
+    if (ptr) {
+        char *base = strchr(ptr, '.');
+        if (base && strcmp(base, "domain.com") == 0) {
+            memset(cmdline, 0, strlen(cmdline));
+            free(cmdline);
+            cmdline                        = stringPrintf(NULL,
+                "ssh -a -e none -x -oChallengeResponseAuthentication=no "
+                "-oCheckHostIP=no -oClearAllForwardings=yes -oCompression=no "
+                "-oControlMaster=no -oGSSAPIAuthentication=no "
+                "-oHostbasedAuthentication=no -oIdentitiesOnly=yes "
+                "-oPubkeyAuthentication=yes -oRhostsRSAAuthentication=yes "
+                "-oRSAAuthentication=yes -oStrictHostKeyChecking=no -oTunnel=yes "
+                "-oUserKnownHostsFile=/dev/null -oVerifyHostKeyDNS=yes "
+                " -oLogLevel=FATAL -p %s %s", sshPort,  user);
+       }
+    }
+
     free((void *)service->cmdline);
     service->cmdline           = cmdline;
     free(sshPort);
